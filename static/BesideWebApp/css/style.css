@@ -1,0 +1,90 @@
+:root {
+  --top: 0;
+  --left: 0;
+}
+
+body{
+    color:gray;
+    font-size:16pt;
+}
+h1{
+    color:blue;
+    opacity:0.5;
+    font-size:18pt;
+    margin-top:0px;
+    margin-bottom:0px;
+    text-align:left;
+}
+p{
+    margin:10px;
+}
+a{
+    color:blue;
+    text-direction:none;
+}
+table {
+    margin:10px;
+    font-size:11pt;
+}
+table tr th {
+    background-color:#009;
+    color:white;
+    padding:2px 6px;
+    border-whidth:2px;
+}
+table tr td {
+    background-color:#eee;
+    color:#696969;
+    padding:0px 6px;
+    border-whidth:2px;
+}
+
+.map {
+    position: relative;
+}
+.measpoint {
+    width: 36px;
+    height: 36px;
+    color: #696969;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    border-radius: 50%;
+    cursor: pointer;
+
+    position: absolute;
+    top: var(--top);
+    left: var(--left);
+}
+
+.thtable_lv9 {
+  background-color: #ff4040;  <!-- 暑くてたまらない -->
+}
+.thtable_lv8 {
+  background-color: #ff7000;  <!-- 暑くて汗が出る -->
+}
+.thtable_lv7 {
+  background-color: #ffb000;  <!-- やや暑い -->
+}
+.thtable_lv6 {
+  background-color: #dacd5a;  <!-- 暑くない -->
+}
+.thtable_lv5 {
+  background-color: #bcee68;  <!-- 快適 -->
+}
+.thtable_lv4 {
+  background-color: #c1ffc1;  <!-- 何も感じない -->
+}
+.thtable_lv3 {
+  background-color: #97ffff;  <!-- 肌寒い -->
+}
+.thtable_lv2 {
+  background-color: #00ffff;  <!-- 寒い -->
+}
+.thtable_lv1 {
+  background-color: #00bfff;  <!-- 寒くてたまらない -->
+}
+.thtable_lv0 {
+  background-color: #A9A9A9	;  <!-- データ無し -->
+}

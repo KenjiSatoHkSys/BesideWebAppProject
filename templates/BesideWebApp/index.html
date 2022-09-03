@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>Besideモニタ</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'BesideWebApp/css/style.css' %}" />
+
+    <!-- ローカル用
+    <meta http-equiv="refresh" content="180; URL=http://127.0.0.1:8000/">
+-->
+    <!-- サーバー用
+    <meta http-equiv="refresh" content="180; URL=https://besidemonitor01.herokuapp.com/">
+-->
+<!--
+    <script type="text/javascript" src="{% static 'BesideWebApp/js/canvas.js' %}"></script>
+-->
+</head>
+<body>
+    {% csrf_token %}
+    <table>
+        <tr>
+            <th>No</th>
+            <th>測定場所</th>
+            <th>CO2<br>ppm</th>
+            <th>温度<br>℃</th>
+            <th>湿度<br>RH%</th>
+            <th>不快<br>指数</th>
+            <th>独自<br>指標</th>
+            <th>時刻</th>
+        </tr>
+        {% for item in data %}
+            <tr>
+                <td>{{item.no}}</td>
+                <td>{{item.disp_name}}</td>
+                <td>{{item.co2}}</td>
+                <td>{{item.temp}}</td>
+                <td>{{item.humid}}</td>
+                <td class="{{item.thi_css_class}}">{{item.thi}}</td>
+                <td class="{{item.thi_css_class}}">{{item.thi_nickname}}</td>
+                <td>{{item.mtime}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <div class="map">
+        <img src="{% static 'BesideWebApp/office_layout.png' %}" width="350" height="350">
+        {% for item in data %}
+            <div class="measpoint {{item.thi_css_class}}" style="--left: {{item.map_x}}px; --top: {{item.map_y}}px;">
+                {{item.no}}
+            </div>
+        {% endfor %}
+    </div>
+    <table>
+        <tr><th>不快指数</th><th>体感</th><th>独自指標</th></tr>
+        <tr><td class="thtable_lv9">85～</td>  <td class="thtable_lv9">暑くてたまらない</td><td class="thtable_lv9">暑3</td></tr>
+        <tr><td class="thtable_lv8">80～85</td><td class="thtable_lv8">暑くて汗が出る</td><td class="thtable_lv8">暑2</td></tr>
+        <tr><td class="thtable_lv7">75～80</td><td class="thtable_lv7">やや暑い</td><td class="thtable_lv7">暑1</td></tr>
+        <tr><td class="thtable_lv6">70～75</td><td class="thtable_lv6">暑くない</td><td class="thtable_lv6">可</td></tr>
+        <tr><td class="thtable_lv5">65～70</td><td class="thtable_lv5">快適</td><td class="thtable_lv5">快適</td></tr>
+        <tr><td class="thtable_lv4">60～65</td><td class="thtable_lv4">何も感じない</td><td class="thtable_lv4">快適</td></tr>
+        <tr><td class="thtable_lv3">55～60</td><td class="thtable_lv3">肌寒い</td><td class="thtable_lv3">寒1</td></tr>
+        <tr><td class="thtable_lv2">50～55</td><td class="thtable_lv2">寒い</td><td class="thtable_lv2">寒2</td></tr>
+        <tr><td class="thtable_lv1">～50</td>  <td class="thtable_lv1">寒くてたまらない</td><td class="thtable_lv1">寒3</td></tr>
+    </table>
+</body>
+</html>
