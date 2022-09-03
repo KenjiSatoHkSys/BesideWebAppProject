@@ -1,1 +1,1 @@
-web: gunicorn BesideWebAppPrj.wsgi
+web: gunicorn BesideWebAppProject.wsgi
