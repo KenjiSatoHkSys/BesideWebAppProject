@@ -26,7 +26,6 @@ class Openweather_db(models.Model):
 class Manager_db(models.Model):
     # データ取得サイクル。OpenWeatherアクセス頻度：無償版はAPIの呼び出しが100万コール/月（60コール/分）以内
     cycle = models.IntegerField()  # data retrieving cycle (second)
-    comment = models.CharField(max_length=100)  # ダミーフィールド。makemigrations再実行させることができるかテスト用。
 
     def __str__(self):
         return 'id:'+str(self.id)+', cycle: '+str(self.cycle)
