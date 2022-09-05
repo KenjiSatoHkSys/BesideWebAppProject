@@ -1,11 +1,12 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.sites import requests
-from django.http import request
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.shortcuts import redirect
 from django.http import HttpResponse
+from django.urls import reverse
 import requests
 import datetime
-import time
 from .models import Beside_db
 from .models import Openweather_db
 from .models import Manager_db
@@ -38,7 +39,7 @@ class beside:
             time_str = time_str.replace('T', ' ').replace('Z', '')
             time_val = datetime.datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
             time_val = time_val + datetime.timedelta(hours=9)
-            time_str = time_val.strftime('%Y-%m-%d %H:%M')
+            time_str = time_val.strftime('%H:%M %m/%d %Y')
             return {
                 'no': self.no,
                 'disp_name': self.disp_name,
@@ -111,12 +112,14 @@ class OpenWeather:
             time_val = opwdata["current"]["dt"]  # unix time（ex. 1661660069)
             time_val = datetime.datetime.fromtimestamp(time_val)  # 2022-08-28 13:14:29
 #            time_val = time_val + datetime.timedelta(hours=-9)
-            time_str = time_val.strftime('%Y-%m-%d %H:%M')
+            time_str = time_val.strftime('%H:%M %m/%d %Y')
+            x = '{:.0f}'.format(1.05 * 350)
+            y = '{:.0f}'.format(0.5 * 350)
             return {
                 'no': '外',
                 'disp_name': '外気',
-                'map_x': 1.1,
-                'map_y': 1.1,
+                'map_x': x,
+                'map_y': y,
                 'temp': t_str,
                 'humid': h_str,
                 'thi': thi_str,
@@ -126,11 +129,13 @@ class OpenWeather:
                 'mtime': time_str
             }
         else:  # 正常にデータが取得できなかった場合は表には'-'を記載
+            x = '{:.0f}'.format(1.05 * 350)
+            y = '{:.0f}'.format(0.5 * 350)
             return {
                 'no': '外',
                 'disp_name': '外気',
-                'map_x': 1.1,
-                'map_y': 1.1,
+                'map_x': x,
+                'map_y': y,
                 'temp': '-',
                 'humid': '-',
                 'thi': '-',
@@ -170,22 +175,11 @@ def thi_stats(THI):  # 不快指数の色を返す
         return {'css_class': 'thtable_lv1', 'nickname': '寒3'}  # 寒くてたまらない
 
 
-def index22(request):
+@login_required
+def index(request):
     # Beside使用準備
     besides = []  # 全Besideのコレクション
     props = Beside_db.objects.all().values()
-#    props = [
-#        {'no': 1, 'room_name': 'kikaku_05_2516', 'co2_cal': 128, 'map_x': 0.6, 'map_y': 0.25, 'disp_name': '知財G'},
-#        {'no': 2, 'room_name': 'kikaku_08_2452', 'co2_cal': 17, 'map_x': 0.94, 'map_y': 0.3, 'disp_name': '打合せコーナーC'},
-#        {'no': 3, 'room_name': 'kikaku_02_2450', 'co2_cal': 197, 'map_x': 0.5, 'map_y': 0.4, 'disp_name': '原価企画_財務G（モニタ横）'},
-#        {'no': 4, 'room_name': 'kikaku_10_2451', 'co2_cal': 28, 'map_x': 0.097, 'map_y': 0.7, 'disp_name': 'フリロケエリア（管理G側）'},
-#        {'no': 5, 'room_name': 'kikaku_01_2519', 'co2_cal': 115, 'map_x': 0.25, 'map_y': 0.7, 'disp_name': 'フリロケエリア（経企G側）'},
-#        {'no': 6, 'room_name': 'kikaku_03_2520', 'co2_cal': -83, 'map_x': 0.42, 'map_y': 0.7, 'disp_name': '原価企画_財務G（管理G側）'},
-#        {'no': 7, 'room_name': 'kikaku_09_2454', 'co2_cal': 0, 'map_x': 0.57, 'map_y': 0.7, 'disp_name': '原価企画_財務G（打A側）'},
-#        {'no': 8, 'room_name': 'kikaku_06_2455', 'co2_cal': -42, 'map_x': 0.77, 'map_y': 0.7, 'disp_name': '法規G_国際標準化G'},
-#        {'no': 9, 'room_name': 'kikaku_07_2457', 'co2_cal': -232, 'map_x': 0.94, 'map_y': 0.63, 'disp_name': '打合せコーナーA'}
-#        ]
-
     for prop in props:  # besideインスタンス作成
         besideAPIURL = 'https://e23hecpmok.execute-api.ap-northeast-1.amazonaws.com/dev/get_besidedata_for_test?room_name='  # API url
         besideAPIURL = besideAPIURL + prop['room_name']
@@ -214,3 +208,29 @@ def index22(request):
         'data': data,
     }
     return render(request, 'BesideWebApp/index.html', params)
+
+
+def viewslogin(request):
+    if request.method == 'POST':  # POST
+        ID = request.POST.get('userid')     # フォーム入力のユーザーID・パスワード取得
+        Pass = request.POST.get('password')
+        user = authenticate(username=ID, password=Pass)  # Djangoの認証機能
+        if user:  # ユーザー認証
+            #ユーザーアクティベート判定
+            if user.is_active:  # ログイン
+                login(request, user)
+                # ホームページ遷移
+                return HttpResponseRedirect(reverse('BesideWebApp:index'))  # reverse関数(django.urls.reverse) : 関数名からURLを逆引き
+            else:  # アカウント利用不可
+                return HttpResponse("アカウントが有効ではありません")
+        else:  # ユーザー認証失敗
+            return HttpResponse("ログインIDまたはパスワードが間違っています")
+    else:  # GET
+        return render(request, 'BesideWebApp/login.html')
+
+
+#ログアウト
+@login_required
+def viewslogout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('BesideWebApp:viewslogin'))  # ログイン画面遷移

@@ -3,5 +3,7 @@ from . import views
 
 app_name = 'BesideWebApp'
 urlpatterns = [
-    path('', views.index22, name='index33'),  # (パラメータ)第1：アドレスバーのURL、第2：views.pyの中のクラス名、
+    path('', views.viewslogin, name='viewslogin'),
+    path('logout', views.viewslogout, name='viewslogout'),
+    path('index', views.index, name='index'),  # (パラメータ)第1：アドレスバーのURL、第2：views.pyの中のクラス名、
 ]

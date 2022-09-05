@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>Besideモニタ-login</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'BesideWebApp/css/style.css' %}" />
+</head>
+<body>
+    <h1>Besideモニタ・ログイン画面</h1>
+    <form method="post" action="{% url 'BesideWebApp:viewslogin' %}">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td><label for="userid">ユーザーID:</label></td>
+                <td><input type="text" name="userid"></td>
+            </tr>
+            <tr>
+                <td><label for="password">パスワード：</label></td>
+                <td><input type="password" name="password"></td>
+            </tr>
+        </table>
+        <input type="submit" class="btn" value="Login">
+    </form>
+    <br><br>
+    <button onclick="location.href='admin/'">管理者画面へ</button>
+</body>
+</html>

@@ -6,12 +6,12 @@
     <title>Besideモニタ</title>
     <link rel="stylesheet" type="text/css" href="{% static 'BesideWebApp/css/style.css' %}" />
 
-    <!-- ローカル用
-    <meta http-equiv="refresh" content="{{cycle}}; URL=http://127.0.0.1:8000/">
--->
-    <!-- サーバー用-->
-    <meta http-equiv="refresh" content="{{cycle}}; URL=https://besidemonitor01.herokuapp.com/">
+    <!-- ローカル用-->
+    <meta http-equiv="refresh" content="{{cycle}}; URL=http://127.0.0.1:8000/index">
 
+    <!-- サーバー用
+    <meta http-equiv="refresh" content="{{cycle}}; URL=https://besidemonitor01.herokuapp.com/index">
+-->
 <!--
     <script type="text/javascript" src="{% static 'BesideWebApp/js/canvas.js' %}"></script>
 -->
@@ -27,7 +27,7 @@
             <th>湿度<br>RH%</th>
             <th>不快<br>指数</th>
             <th>独自<br>指標</th>
-            <th>時刻</th>
+            <th>測定時刻</th>
         </tr>
         {% for item in data %}
             <tr>
