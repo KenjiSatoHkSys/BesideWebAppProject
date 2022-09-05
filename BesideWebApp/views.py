@@ -114,7 +114,7 @@ class OpenWeather:
 #            time_val = time_val + datetime.timedelta(hours=-9)
             time_str = time_val.strftime('%H:%M %m/%d %Y')
             x = '{:.0f}'.format(1.05 * 350)
-            y = '{:.0f}'.format(0.5 * 350)
+            y = '{:.0f}'.format(0.4 * 350)
             return {
                 'no': '外',
                 'disp_name': '外気',
@@ -130,7 +130,7 @@ class OpenWeather:
             }
         else:  # 正常にデータが取得できなかった場合は表には'-'を記載
             x = '{:.0f}'.format(1.05 * 350)
-            y = '{:.0f}'.format(0.5 * 350)
+            y = '{:.0f}'.format(0.4 * 350)
             return {
                 'no': '外',
                 'disp_name': '外気',
