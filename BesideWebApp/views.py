@@ -111,7 +111,7 @@ class OpenWeather:
             thi_str = '{:.1f}'.format(thi)
             time_val = opwdata["current"]["dt"]  # unix time（ex. 1661660069)
             time_val = datetime.datetime.fromtimestamp(time_val)  # 2022-08-28 13:14:29
-#            time_val = time_val + datetime.timedelta(hours=-9)
+            time_val = time_val + datetime.timedelta(hours=9)
             time_str = time_val.strftime('%H:%M %m/%d %Y')
             x = '{:.0f}'.format(1.05 * 350)
             y = '{:.0f}'.format(0.4 * 350)
