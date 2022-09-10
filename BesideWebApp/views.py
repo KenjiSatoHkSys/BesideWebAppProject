@@ -177,15 +177,16 @@ def thi_stats(THI):  # 不快指数の色を返す
 
 # @login_required
 def index(request):
-    dt_now = datetime.datetime.now()
-    now = dt_now.time()  # 現在時刻
-    dt_st1 = datetime.time(20, 0, 0)  # 待機画面への遷移開始時刻
-    dt_st2 = datetime.time(20, 30, 0)  # 通常画面への遷移開始時刻
-    ps = request.path
-    if (dt_st1 <= now < dt_st2) and (ps != '/onetime'):
-        # 夜間待機画面。この待機時間帯にherokuの再起動が行われるようにする。
+    # このアプリの場合10:00AM前後にherokuの再起動が行われる。再起動処理中にリクエストが重なるとNotFoundエラーとなり画面が停止する為
+    # 10:00を中心に30分間は待機画面へ遷移
+#    dt_now = datetime.datetime.now()
+#    now = dt_now.time()  # 現在時刻
+#    dt_st1 = datetime.time(9, 45, 0)  # 待機画面への遷移開始時刻
+#    dt_st2 = datetime.time(10, 15, 0)  # 通常画面への遷移開始時刻
+#    ps = request.path
+#    if (dt_st1 <= now < dt_st2) and (ps != '/onetime'):
         # 夜間待機画面で「Onetime」ボタンが押されたらこのルーチンはパスして1回のみ通常画面を表示。
-        return render(request, 'BesideWebApp/standby.html')
+#        return render(request, 'BesideWebApp/standby.html')
 
     # Beside使用準備
     besides = []  # 全Besideのコレクション
@@ -211,11 +212,22 @@ def index(request):
     data.append(opw.current())      # 現在値の取得(Open weather)→コレクションへ追加
 
     # データ更新周期
-    props_m = Manager_db.objects.all().values()
+    dt_now = datetime.datetime.now()
+    now = dt_now.time()  # 現在時刻
+    dt_st1 = datetime.time(9, 45, 0)   # 待機開始時刻
+    dt_st2 = datetime.time(10, 15, 0)  # 待機終了時刻
+    if (dt_st1 <= now < dt_st2):
+        cycle = 1800  # 30min(9:45 - 10:15)
+        sign = '9:45-10:15待機中'
+    else:
+        props_m = Manager_db.objects.all().values()
+        cycle = props_m[0]['cycle']
+        sign = ''
 
     params = {
-        'cycle': props_m[0]['cycle'],  # データ更新周期
+        'cycle': cycle,  # データ更新周期
         'data': data,
+        'stanbysign': sign,
     }
     return render(request, 'BesideWebApp/index.html', params)
 
