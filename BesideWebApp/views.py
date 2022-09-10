@@ -117,7 +117,7 @@ class OpenWeather:
             y = '{:.0f}'.format(0.4 * 350)
             return {
                 'no': '外',
-                'disp_name': '外気',
+                'disp_name': '外気(OpenWeather)',
                 'map_x': x,
                 'map_y': y,
                 'temp': t_str,
@@ -175,8 +175,18 @@ def thi_stats(THI):  # 不快指数の色を返す
         return {'css_class': 'thtable_lv1', 'nickname': '寒3'}  # 寒くてたまらない
 
 
-@login_required
+# @login_required
 def index(request):
+    dt_now = datetime.datetime.now()
+    now = dt_now.time()  # 現在時刻
+    dt_st1 = datetime.time(20, 0, 0)  # 待機画面への遷移開始時刻
+    dt_st2 = datetime.time(20, 30, 0)  # 通常画面への遷移開始時刻
+    ps = request.path
+    if (dt_st1 <= now < dt_st2) and (ps != '/onetime'):
+        # 夜間待機画面。この待機時間帯にherokuの再起動が行われるようにする。
+        # 夜間待機画面で「Onetime」ボタンが押されたらこのルーチンはパスして1回のみ通常画面を表示。
+        return render(request, 'BesideWebApp/standby.html')
+
     # Beside使用準備
     besides = []  # 全Besideのコレクション
     props = Beside_db.objects.all().values()
@@ -230,7 +240,7 @@ def viewslogin(request):
 
 
 #ログアウト
-@login_required
+# @login_required
 def viewslogout(request):
     logout(request)
     return HttpResponseRedirect(reverse('BesideWebApp:viewslogin'))  # ログイン画面遷移
