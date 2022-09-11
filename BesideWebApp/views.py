@@ -175,7 +175,7 @@ def thi_stats(THI):  # 不快指数の色を返す
         return {'css_class': 'thtable_lv1', 'nickname': '寒3'}  # 寒くてたまらない
 
 
-# @login_required
+@login_required
 def index(request):
     # Beside使用準備
     besides = []  # 全Besideのコレクション
@@ -201,16 +201,19 @@ def index(request):
     data.append(opw.current())      # 現在値の取得(Open weather)→コレクションへ追加
 
     # データ更新周期
-    # このアプリの場合10:00AM前後にherokuの再起動が行われる。
-    # 再起動処理中にリクエストが重なるとNotFoundエラーとなり画面が停止する為、再起動の前後30min間、つまり9:45-10:15はリクエストを行わない。
-    # 9:45よりも後に来たリクエスト（10:00までのリクエストを対象）に対してはリフレッシュ間隔として30minを返す。
+    # Herokuでは24h周期でアプリ(dyno)の再起動が行われる。
+    # 再起動処理中にリクエストが重なるとNotFoundエラーとなり画面が停止する為、再起動処理中はリクエストを行わないようにする。
+    # 日本時間の23:30（HerokuはUTCのため14:30）に再起動が行われるようにする。
+    # 再起動の10分前に来たリクエストに対してはリフレッシュ間隔として20minを返す。
+    # これにより次のリクエストは再起動の10分後に発生するようにする。
+    # ******日本時間の23:30に heroku restart コマンドを実行し、再起動タイミングを同時刻にセットすること！******
     dt_now = datetime.datetime.now()
     now = dt_now.time()  # 現在時刻
-    dt_st1 = datetime.time(0, 45, 0)   # 画面リフレッシュ間隔に待機時間の30minを与える開始時刻
-    dt_st2 = datetime.time(1, 0, 0)  # 同終了時刻
+    dt_st1 = datetime.time(14, 20, 0)  # この時刻以降のリクエストには画面リフレッシュ間隔に待機時間の20minを返す
+    dt_st2 = datetime.time(14, 30, 0)  # この時刻以降のリクエストには画面リフレッシュ間隔に通常の3minを返す
     if (dt_st1 <= now < dt_st2):
-        cycle = 1800  # 30min(9:45 - 10:15)
-        sign = '9:45-10:15待機中'
+        cycle = 1200  # 20min(UTC 14:20-14:40, JST 23:20-23:40)
+        sign = '23:20-23:40待機中(Rebooting server)'
     else:
         # props_m = Manager_db.objects.all().values()
         # cycle = props_m[0]['cycle']
@@ -235,7 +238,7 @@ def viewslogin(request):
             if user.is_active:  # ログイン
                 login(request, user)
                 # ホームページ遷移
-                return HttpResponseRedirect(reverse('BesideWebApp:index'))  # reverse関数(django.urls.reverse) : 関数名からURLを逆引き
+                return HttpResponseRedirect(reverse('BesideWebApp:index1'))  # reverse関数(django.urls.reverse) : 関数名からURLを逆引き
             else:  # アカウント利用不可
                 return HttpResponse("アカウントが有効ではありません")
         else:  # ユーザー認証失敗
@@ -245,7 +248,7 @@ def viewslogin(request):
 
 
 #ログアウト
-# @login_required
+@login_required
 def viewslogout(request):
     logout(request)
     return HttpResponseRedirect(reverse('BesideWebApp:viewslogin'))  # ログイン画面遷移
