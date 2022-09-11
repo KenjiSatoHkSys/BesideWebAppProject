@@ -175,7 +175,7 @@ def thi_stats(THI):  # 不快指数の色を返す
         return {'css_class': 'thtable_lv1', 'nickname': '寒3'}  # 寒くてたまらない
 
 
-@login_required
+# @login_required
 def index(request):
     # Beside使用準備
     besides = []  # 全Besideのコレクション
@@ -247,8 +247,8 @@ def viewslogin(request):
         return render(request, 'BesideWebApp/login.html')
 
 
-#ログアウト
-@login_required
+# ログアウト
+# @login_required
 def viewslogout(request):
     logout(request)
     return HttpResponseRedirect(reverse('BesideWebApp:viewslogin'))  # ログイン画面遷移
