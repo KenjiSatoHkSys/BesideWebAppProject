@@ -206,8 +206,8 @@ def index(request):
     # 9:45よりも後に来たリクエスト（10:00までのリクエストを対象）に対してはリフレッシュ間隔として30minを返す。
     dt_now = datetime.datetime.now()
     now = dt_now.time()  # 現在時刻
-    dt_st1 = datetime.time(9, 45, 0)   # 画面リフレッシュ間隔に待機時間の30minを与える開始時刻
-    dt_st2 = datetime.time(10, 0, 0)  # 同終了時刻
+    dt_st1 = datetime.time(0, 45, 0)   # 画面リフレッシュ間隔に待機時間の30minを与える開始時刻
+    dt_st2 = datetime.time(1, 0, 0)  # 同終了時刻
     if (dt_st1 <= now < dt_st2):
         cycle = 1800  # 30min(9:45 - 10:15)
         sign = '9:45-10:15待機中'
