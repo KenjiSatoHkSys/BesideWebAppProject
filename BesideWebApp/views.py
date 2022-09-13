@@ -175,12 +175,23 @@ def thi_stats(THI):  # 不快指数の色を返す
         return {'css_class': 'thtable_lv1', 'nickname': '寒3'}  # 寒くてたまらない
 
 
-# Herokuでは24h周期でアプリ(dyno)の再起動が行われる。
-# ログイン処理を持たせている場合、再起動後のリクエストに対しては Not found が画面に表示され停止してしまう。
-# よって、ログイン処理はなしにする必要あり。
-
-# @login_required
+@login_required
 def index(request):
+    # Herokuでは24h周期でアプリ(dyno)の再起動が行われ、再起動後は再度ログインが必要。
+    # そこで0:00～6:00 JSTの間はログインさせないようにし（使用中でも0:00 JSTに強制ログアウト）
+    # 6:00 JST以降に手動ログインするものとし、これにより24:00 JSTまでは18hとなり24h未満につき勤務時間中の再起動を防ぐ。
+    dt_now = datetime.datetime.now()  # UTC
+    now = dt_now.time()  # 現在時刻
+    # dt_st1～dt_st2の期間に来たリクエストに対してはlogin画面へ誘導
+    # ローカル（テスト）用
+#    dt_st1 = datetime.time(18, 25, 0)  # JST
+#    dt_st2 = datetime.time(18, 35, 0)  # JST
+    # サーバー用
+    dt_st1 = datetime.time(15, 0, 0)  # 15:00 UTC = 0:00 JST
+    dt_st2 = datetime.time(21, 0, 0)  # 21:00 UTC = 6:00 JST
+    if (dt_st1 <= now < dt_st2):
+        return render(request, 'BesideWebApp/login.html')
+
     # Beside使用準備
     besides = []  # 全Besideのコレクション
     props = Beside_db.objects.all().values()
@@ -204,30 +215,13 @@ def index(request):
         data.append(bsd.current())  # 現在値の取得(beside)→コレクションへ追加
     data.append(opw.current())      # 現在値の取得(Open weather)→コレクションへ追加
 
-    # データ更新周期
-    # Herokuでは24h周期でアプリ(dyno)の再起動が行われる。
-    # 再起動処理中にリクエストが重なるとエラーになる可能性がある為、再起動処理中はリクエストを行わないようにする。
-    # 日本時間の23:30（HerokuはUTCのため14:30）に再起動が行われるようにする。
-    # 再起動の10分前に来たリクエストに対してはリフレッシュ間隔として20minを返す。
-    # これにより次のリクエストは再起動の10分後に発生するようにする。
-    # ******日本時間の23:30に heroku restart コマンドを実行し、再起動タイミングを同時刻にセットすること！******
-    dt_now = datetime.datetime.now()
-    now = dt_now.time()  # 現在時刻
-    dt_st1 = datetime.time(14, 20, 0)  # この時刻以降のリクエストには画面リフレッシュ間隔に待機時間の20minを返す
-    dt_st2 = datetime.time(14, 30, 0)  # この時刻以降のリクエストには画面リフレッシュ間隔に通常の3minを返す
-    if (dt_st1 <= now < dt_st2):
-        cycle = 1200  # 20min(UTC 14:20-14:40, JST 23:20-23:40)
-        sign = '23:20-23:40待機中(Rebooting server)'
-    else:
-        # props_m = Manager_db.objects.all().values()
-        # cycle = props_m[0]['cycle']
-        cycle = 180  # 3min  上記のようにdbで指定できるが自由に変更すると不具合を起こす可能性があり固定値とする
-        sign = ''
+    cycle = 180  # 3min  下記のようにdbで指定できるが自由に変更すると不具合を起こす可能性があり固定値とする
+    # props_m = Manager_db.objects.all().values()
+    # cycle = props_m[0]['cycle']
 
     params = {
         'cycle': cycle,  # データ更新周期
         'data': data,
-        'stanbysign': sign,
     }
     return render(request, 'BesideWebApp/index.html', params)
 
@@ -252,7 +246,7 @@ def viewslogin(request):
 
 
 # ログアウト
-# @login_required
+@login_required
 def viewslogout(request):
     logout(request)
     return HttpResponseRedirect(reverse('BesideWebApp:viewslogin'))  # ログイン画面遷移
