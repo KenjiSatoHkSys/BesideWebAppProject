@@ -178,8 +178,8 @@ def thi_stats(THI):  # 不快指数の色を返す
 @login_required
 def index(request):
     # Herokuでは24h周期でアプリ(dyno)の再起動が行われ、再起動後は再度ログインが必要。
-    # そこで0:00～6:00 JSTの間はログインさせないようにし（使用中でも0:00 JSTに強制ログアウト）
-    # 6:00 JST以降に手動ログインするものとし、これにより24:00 JSTまでは18hとなり24h未満につき勤務時間中の再起動を防ぐ。
+    # そこで22:00～6:00 JSTの間はログインさせないようにし（使用中でも22:00 JSTに強制ログアウト）
+    # 6:00 JST以降に手動ログインするものとし、これにより22:00 JSTまでは16hとなり24h未満につき勤務時間中の再起動を防ぐ。
     dt_now = datetime.datetime.now()  # UTC
     now = dt_now.time()  # 現在時刻
     # dt_st1～dt_st2の期間に来たリクエストに対してはlogin画面へ誘導
@@ -187,7 +187,7 @@ def index(request):
 #    dt_st1 = datetime.time(18, 25, 0)  # JST
 #    dt_st2 = datetime.time(18, 35, 0)  # JST
     # サーバー用
-    dt_st1 = datetime.time(15, 0, 0)  # 15:00 UTC = 0:00 JST
+    dt_st1 = datetime.time(13, 0, 0)  # 13:00 UTC = 22:00 JST
     dt_st2 = datetime.time(21, 0, 0)  # 21:00 UTC = 6:00 JST
     if (dt_st1 <= now < dt_st2):
         return render(request, 'BesideWebApp/login.html')
