@@ -175,11 +175,14 @@ def thi_stats(THI):  # 不快指数の色を返す
         return {'css_class': 'thtable_lv1', 'nickname': '寒3'}  # 寒くてたまらない
 
 
-# 下記loginデコレータ@login_required(login_url='https://besidemonitor01.herokuapp.com/')により、
+# 下記loginデコレータ@login_required(login_url='/')により、
 # heroku restart後のアクセスが発生した際、下記RULがセットされてログイン画面へ遷移する。
 # https://besidemonitor01.herokuapp.com/?next=/index
 
+# デコレータは下記のように書いても同様となる
 # @login_required(login_url='https://besidemonitor01.herokuapp.com/')
+# つまり'https://besidemonitor01.herokuapp.com/'は'/'のみで記述可能
+
 @login_required(login_url='/')
 def index(request):
     # Herokuでは24h周期でアプリ(dyno)の再起動が行われ、再起動後は再度ログインが必要。
