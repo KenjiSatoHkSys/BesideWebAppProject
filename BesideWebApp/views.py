@@ -175,7 +175,7 @@ def thi_stats(THI):  # 不快指数の色を返す
         return {'css_class': 'thtable_lv1', 'nickname': '寒3'}  # 寒くてたまらない
 
 
-@login_required
+@login_required(login_url="BesideWebApp/login.html")
 def index(request):
     # Herokuでは24h周期でアプリ(dyno)の再起動が行われ、再起動後は再度ログインが必要。
     # そこで22:00～6:00 JSTの間はログインさせないようにし（使用中でも22:00 JSTに強制ログアウト）
