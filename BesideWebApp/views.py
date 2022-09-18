@@ -180,7 +180,7 @@ def thi_stats(THI):  # 不快指数の色を返す
 # https://besidemonitor01.herokuapp.com/?next=/index
 
 # @login_required(login_url='https://besidemonitor01.herokuapp.com/')
-@login_required(login_url='besidemonitor01.herokuapp.com/')
+@login_required(login_url='')
 def index(request):
     # Herokuでは24h周期でアプリ(dyno)の再起動が行われ、再起動後は再度ログインが必要。
     # そこで22:00～6:00 JSTの間はログインさせないようにし（使用中でも22:00 JSTに強制ログアウト）
